@@ -14,6 +14,7 @@ This app is written in node.js, so node.js will need to be download and configur
 the node-stateless-verifier project locally.  Run "node install" from within this project directory to install dependencies
  from the package.json file.
 <br/>
+<br/>
 <b>Usage</b>
 <br/>
 <br/>
