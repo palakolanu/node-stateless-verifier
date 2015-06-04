@@ -21,7 +21,7 @@ the node-stateless-verifier project locally.  Run "node install" from within thi
 Edit the necessary app.js global variables, for the specific OpenAM deployment you want to run against.
 This includes the server, port, URI and so on.  Also add in any specifics around the signing and encryption algorithms used. Enter any HMAC shared secrets or public keys in the necessary files (sharedSecret or publicKey) in the node-stateless-verifier directory.
 <br/>
-To run enter <b>node app.js <username> <password></b>
+To run enter <b>node app.js username password</b>
 <br/>
 The username and password refer to a user that is able to authenticate against the appropriate pre-configured stateless realm within OpenAM.
 This will authenticate to the necessary OpenAM realm that is configured for stateless token management.  The stateless tokenId is captured
