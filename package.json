@@ -1,0 +1,9 @@
+{
+    "name": "node-stateless-verifier",
+    "description": "JWT decoder and verifier (ForgeRock OpenAM)",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "jsonwebtoken": "latest"
+    }
+}
