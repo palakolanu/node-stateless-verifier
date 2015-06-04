@@ -27,4 +27,5 @@ The username and password refer to a user that is able to authenticate against t
 This will authenticate to the necessary OpenAM realm that is configured for stateless token management.  The stateless tokenId is captured
 and verified, based on the algorithm and shared secret/public key settings within the app.js file.
 <br/>
+<br/>
 Note - tested against OpenAM 13.0 (nightly build)
