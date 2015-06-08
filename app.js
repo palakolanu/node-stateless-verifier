@@ -2,32 +2,26 @@
 //Simon Moffatt 2 June 2015
 //Based on https://github.com/auth0/node-jsonwebtoken
 
+// Import libs
+var jwt = require('jsonwebtoken'); // 3rd party JWT verification library
+var http = require('http'); // To make http req to OpenAM
+var fs = require('fs'); // To access file system to read in cert data
+
 console.log("OpenAM Stateless Token Verifier: starting \n");
 
-// Check for the correct number of submitted arguments
-if (process.argv.length < 4){
-	
-	console.log("Error! Arguments missing.  Usage: app.js <username> <password> \n");
-	return;	
-}
-
-// Import libs
-var jwt = require('jsonwebtoken');
-var http = require('http');
-
-// Globals
-// --------------------------------------------------------------------------------------------------------------------------------------
+// Globals --------------------------------------------------------------------------------------------------------------------------------
 // For authenticating to OpenAM
 var submittedUsername = process.argv[2]; // Pulled in from arg list
 var submittedPassword = process.argv[3]; // Pulled in from arg list
 
 // JWT Verification
-var sharedSecret = "sharedsecret"; // Secret used by OpenAM for HMAC
-var publicKey = "" // move this to file read
-var algorithm = "HS256" // HS256, HS384, HS512, RS256, RS512, ES256, ES384,
-						// ES512, none
+var pathToSharedSecret = "HMACSharedSecret"; // Used for HMAC signing verification
+var pathToPublicKey = "RSAPublicKey"; // Used for RS signing verification and/or decryption
+var algorithm = "HS256"; // HS256, HS384, HS512, RS256, RS512, ES256, ES384, ES512, none
 
-// OpenAM options
+var sharedSecret = ""; //Gets populated via file
+
+//OpenAM options
 var httpOptions = {
 		  hostname: 'openam.example.com',
 		  port: 8080,
@@ -42,8 +36,27 @@ var httpOptions = {
 
 var postData = '{}'; // Empty JSON payload for authentication request
 
-// Globals
-// --------------------------------------------------------------------------------------------------------------------------------------
+// Globals ---------------------------------------------------------------------------------------------------------------------------------
+
+// Check for the correct number of submitted arguments
+if (process.argv.length < 4){
+		
+	console.log("Error! Arguments missing.  Usage: app.js <username> <password> \n");
+	return;	
+}
+
+// Read in external file that contains HMAC shared secret
+fs.readFile(pathToSharedSecret, 'utf8', function (err,data) {
+  if (err) {
+    return console.log("OpenAM Stateless Token Verifier: error reading shared secret file! \n");
+  }
+  
+  //Pull in shared secret from file and add to global variable for re use
+  sharedSecret = data;
+  fs.close;
+      
+});
+
 
 // Authenticate to OpenAM and get the stateless tokenId value
 function authenticate(){
