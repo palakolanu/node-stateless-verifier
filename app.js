@@ -17,9 +17,10 @@ var submittedPassword = process.argv[3]; // Pulled in from arg list
 // JWT Verification
 var pathToSharedSecret = "HMACSharedSecret"; // Used for HMAC signing verification
 var pathToPublicKey = "RSAPublicKey"; // Used for RS signing verification and/or decryption
-var algorithm = "HS256"; // HS256, HS384, HS512, RS256, RS512, ES256, ES384, ES512, none
+var algorithm = "RS256"; // HS256, HS384, HS512, RS256, RS512, ES256, ES384, ES512, none
 
 var sharedSecret = ""; //Gets populated via file
+var publicKey = ""; //Gets populated via file
 
 //OpenAM options
 var httpOptions = {
@@ -57,6 +58,17 @@ fs.readFile(pathToSharedSecret, 'utf8', function (err,data) {
       
 });
 
+//Read in external file that contains RSA public key
+fs.readFile(pathToPublicKey, 'utf8', function (err,data) {
+  if (err) {
+    return console.log("OpenAM Stateless Token Verifier: error reading public key file! \n");
+  }
+  
+  //Pull in public key from file and add to global variable for re use
+  publicKey = data;  
+  fs.close;
+      
+});
 
 // Authenticate to OpenAM and get the stateless tokenId value
 function authenticate(){
@@ -108,6 +120,8 @@ function getJWT(response){
 // Verify the tokenId against either the RSA or HMAC algo
 function verifyJWT(JWT){
 
+			key = "";
+			
 			// If no signing takes place, just do an unverified decode...
 			if (algorithm === "none") {
 				
@@ -116,11 +130,23 @@ function verifyJWT(JWT){
 				console.log(decoded.serialized_session + "\n");
 				console.log("OpenAM Stateless Token Verifier: token expiration time: " + new Date(JSON.parse(decoded.serialized_session).expiryTime).toString() + "\n");
 	
-			} else { // The JWT has been signed...so needs verifying
+			//An HMAC algorithm is being used so focus on shared secret verification
+			} else if (algorithm[0] ===  "H"){ 
 				
-				try {
-					var decoded = jwt.verify(JWT,sharedSecret, { algorithms: [algorithm] }, function(error, decoded){
-						
+				key = sharedSecret //Map key into shared secret
+				
+			} 
+			//An RS algorithm is being used, so focus on verification using public key cert
+			else if (algorithm[0] === "R") { 
+			
+				key = publicKey //Map key into public key
+				
+			} 
+			
+			//Generic verification used for both shared secret or public key by making key generic and pre mapped
+			try {
+					var decoded = jwt.verify(JWT,key, { algorithms: [algorithm] }, function(error, decoded){
+												
 						// JWT is valid and has been successfully verified
 						if (decoded) {
 						
@@ -142,8 +168,8 @@ function verifyJWT(JWT){
 					console.log("OpenAM Stateless Token Verifier: error verifying token");
 					console.log(error + "\n");
 				
-				};	
-			}
+				};
+	
 }
 
 // Run through
