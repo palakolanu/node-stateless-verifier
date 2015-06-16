@@ -128,7 +128,9 @@ function verifyJWT(JWT){
 				var decoded = jwt.decode(JWT);
 				console.log("OpenAM Stateless Token Verifier: unverified decoded JWT: \n");
 				console.log(decoded.serialized_session + "\n");
-				console.log("OpenAM Stateless Token Verifier: token expiration time: " + new Date(JSON.parse(decoded.serialized_session).expiryTime).toString() + "\n");
+				//console.log("OpenAM Stateless Token Verifier: token expiration time: " + new Date(JSON.parse(decoded.serialized_session).expiryTime).toString() + "\n");
+				console.log("Email: " + decoded.serialized_session['am.protected.session_mail']);
+				console.log("UID: " + decoded.serialized_session['Principals']);
 	
 			//An HMAC algorithm is being used so focus on shared secret verification
 			} else if (algorithm[0] ===  "H"){ 
@@ -152,7 +154,11 @@ function verifyJWT(JWT){
 						
 							console.log("OpenAM Stateless Token Verifier: verified and decoded JWT: \n");
 							console.log(decoded.serialized_session + "\n");
-							console.log("OpenAM Stateless Token Verifier: token expiration time: " + new Date(JSON.parse(decoded.serialized_session).expiryTime).toString() + "\n");
+							console.log("Expiration time: " + new Date(JSON.parse(decoded.serialized_session).expiryTime).toString());
+							console.log("Email: " + JSON.stringify(JSON.parse(decoded.serialized_session).properties['am.protected.session_mail']));
+							console.log("User: " + JSON.stringify(JSON.parse(decoded.serialized_session).properties['Principal']));
+							console.log("\n");
+							
 							
 						} 
 						else { // token can't be verified due to secret being
